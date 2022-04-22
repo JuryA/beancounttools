@@ -5,7 +5,7 @@ import requests
 
 
 def build_header(token):
-    return {"Authorization": "Bearer " + token}
+    return {"Authorization": f"Bearer {token}"}
 
 
 def check_result(result):
@@ -43,8 +43,7 @@ def list_bank(token, country):
 def create_link(token, reference, bank):
     if not bank:
         raise Exception("Please specify --bank it is required for create_link")
-    requisitionId = _find_requisition_id(token, reference)
-    if requisitionId:
+    if requisitionId := _find_requisition_id(token, reference):
         print(f"Link for for reference {reference} already exists.")
     else:
         r = requests.post(
@@ -91,8 +90,7 @@ def list_accounts(token):
 
 
 def delete_link(token, reference):
-    requisitionId = _find_requisition_id(token, reference)
-    if requisitionId:
+    if requisitionId := _find_requisition_id(token, reference):
         r = requests.delete(
             f"https://ob.nordigen.com/api/v2/requisitions/{requisitionId}",
             headers=build_header(token),
@@ -104,11 +102,14 @@ def _find_requisition_id(token, userId):
     headers = build_header(token)
     r = requests.get("https://ob.nordigen.com/api/v2/requisitions/", headers=headers)
     check_result(r)
-    for req in r.json()["results"]:
-        if req["reference"] == userId:
-            return req["id"]
-
-    return None
+    return next(
+        (
+            req["id"]
+            for req in r.json()["results"]
+            if req["reference"] == userId
+        ),
+        None,
+    )
 
 
 def parse_args(args):

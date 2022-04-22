@@ -16,7 +16,7 @@ class Importer(importer.ImporterProtocol):
     """An importer for Bitstamp."""
 
     def identify(self, file):
-        return "bitstamp.yaml" == path.basename(file.name)
+        return path.basename(file.name) == "bitstamp.yaml"
 
     def file_account(self, file):
         return ""
@@ -72,29 +72,31 @@ class Importer(importer.ImporterProtocol):
             )
             postings = [
                 data.Posting(
-                    self.account + ":" + posCcy,
+                    f"{self.account}:{posCcy}",
                     amount.Amount(posAmt, posCcy),
                     cost,
                     None,
                     None,
                     None,
-                ),
+                )
             ]
+
         elif type == 1:
             narration = "Withdrawal"
             postings = [
                 data.Posting(
-                    self.account + ":" + negCcy,
+                    f"{self.account}:{negCcy}",
                     amount.Amount(negAmt, negCcy),
                     None,
                     None,
                     None,
                     None,
-                ),
+                )
             ]
+
         elif type == 2:
             fee = D(trx["fee"])
-            if posCcy.lower() + "_" + negCcy.lower() in trx:
+            if f"{posCcy.lower()}_{negCcy.lower()}" in trx:
                 feeCcy = negCcy
                 negAmt -= fee
             else:
@@ -119,7 +121,7 @@ class Importer(importer.ImporterProtocol):
 
             postings = [
                 data.Posting(
-                    self.account + ":" + posCcy,
+                    f"{self.account}:{posCcy}",
                     amount.Amount(posAmt, posCcy),
                     posCcyCost,
                     posCcyPrice,
@@ -127,7 +129,7 @@ class Importer(importer.ImporterProtocol):
                     None,
                 ),
                 data.Posting(
-                    self.account + ":" + negCcy,
+                    f"{self.account}:{negCcy}",
                     amount.Amount(negAmt, negCcy),
                     negCcyCost,
                     negCcyPrice,
@@ -135,6 +137,7 @@ class Importer(importer.ImporterProtocol):
                     None,
                 ),
             ]
+
             if float(fee) > 0:
                 postings.append(
                     data.Posting(
@@ -151,7 +154,7 @@ class Importer(importer.ImporterProtocol):
             )
 
         else:
-            raise ValueError("Transaction type " + str(type) + " is not handled")
+            raise ValueError(f"Transaction type {type} is not handled")
 
         meta = data.new_metadata("bitstamp", id, {"ref": str(id)})
         return data.Transaction(

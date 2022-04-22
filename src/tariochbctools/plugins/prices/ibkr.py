@@ -16,12 +16,11 @@ class Source(source.Source):
         try:
             response = client.download(token, queryId)
         except client.ResponseCodeError as e:
-            if e.code == "1018":
-                sleep(10)
-                response = client.download(token, queryId)
-            else:
+            if e.code != "1018":
                 raise e
 
+            sleep(10)
+            response = client.download(token, queryId)
         statement = parser.parse(response)
         for position in statement.FlexStatements[0].OpenPositions:
             if position.symbol.rstrip("z") == ticker:

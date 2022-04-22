@@ -9,7 +9,7 @@ class PriceLookup:
         self.baseCcy = baseCcy
 
     def fetchPriceAmount(self, instrument: str, date: date):
-        price = prices.get_price(self.priceMap, tuple([instrument, self.baseCcy]), date)
+        price = prices.get_price(self.priceMap, (instrument, self.baseCcy), date)
         return price[1]
 
     def fetchPrice(self, instrument: str, date: date):

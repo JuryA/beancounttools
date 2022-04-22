@@ -14,7 +14,7 @@ class Importer(importer.ImporterProtocol):
     """An importer for Transferwise using the API."""
 
     def identify(self, file):
-        return "transferwise.yaml" == path.basename(file.name)
+        return path.basename(file.name) == "transferwise.yaml"
 
     def file_account(self, file):
         return ""
@@ -31,7 +31,7 @@ class Importer(importer.ImporterProtocol):
             date.today(), datetime.max.time(), timezone.utc
         ).isoformat()
 
-        headers = {"Authorization": "Bearer " + token}
+        headers = {"Authorization": f"Bearer {token}"}
         r = requests.get("https://api.transferwise.com/v1/profiles", headers=headers)
         profiles = r.json()
         profileId = profiles[0]["id"]
