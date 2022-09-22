@@ -13,7 +13,7 @@ class MailAdapterImporter(importer.ImporterProtocol):
         self.importers = importers
 
     def identify(self, file):
-        return "mail.yaml" == path.basename(file.name)
+        return path.basename(file.name) == "mail.yaml"
 
     def extract(self, file, existing_entries):
         config = yaml.safe_load(file.contents())

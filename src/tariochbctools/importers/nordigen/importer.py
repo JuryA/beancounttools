@@ -16,7 +16,7 @@ class Importer(importer.ImporterProtocol):
     """An importer for Nordigen API (e.g. for Revolut)."""
 
     def identify(self, file):
-        return "nordigen.yaml" == path.basename(file.name)
+        return path.basename(file.name) == "nordigen.yaml"
 
     def file_account(self, file):
         return ""
@@ -38,7 +38,7 @@ class Importer(importer.ImporterProtocol):
             raise HttpServiceException(e, e.response.text)
 
         token = r.json()["access"]
-        headers = {"Authorization": "Bearer " + token}
+        headers = {"Authorization": f"Bearer {token}"}
 
         entries = []
         for account in config["accounts"]:

@@ -17,15 +17,15 @@ class Importer(importer.ImporterProtocol):
     """An importer for Interactive Broker using the flex query service."""
 
     def identify(self, file):
-        return "ibkr.yaml" == path.basename(file.name)
+        return path.basename(file.name) == "ibkr.yaml"
 
     def file_account(self, file):
         return ""
 
     def matches(self, trx, t):
         p = re.compile(r".* (?P<perShare>\d+\.?\d+) PER SHARE")
-        trxPerShare = p.search(trx.description).group("perShare")
-        tPerShare = p.search(t["description"]).group("perShare")
+        trxPerShare = p.search(trx.description)["perShare"]
+        tPerShare = p.search(t["description"])["perShare"]
 
         return (
             t["date"] == trx.dateTime
@@ -158,7 +158,7 @@ class Importer(importer.ImporterProtocol):
         priceLookup,
         description,
     ):
-        narration = "Dividend for " + str(quantity) + " : " + description
+        narration = f"Dividend for {str(quantity)} : {description}"
         liquidityAccount = self.getLiquidityAccount(assetAccount, asset, currency)
         incomeAccount = self.getIncomeAccount(assetAccount, asset)
 
@@ -198,13 +198,13 @@ class Importer(importer.ImporterProtocol):
 
     def getLiquidityAccount(self, assetAccount, asset, currency):
         return assetAccount.replace(":Investment:", ":Liquidity:").replace(
-            ":" + asset, ":" + currency
+            f":{asset}", f":{currency}"
         )
 
     def getReceivableAccount(self, assetAccount, asset):
         parts = assetAccount.split(":")
-        return "Assets:" + parts[1] + ":Receivable:Verrechnungssteuer"
+        return f"Assets:{parts[1]}:Receivable:Verrechnungssteuer"
 
     def getIncomeAccount(self, assetAccount, asset):
         parts = assetAccount.split(":")
-        return "Income:" + parts[1] + ":Interest"
+        return f"Income:{parts[1]}:Interest"

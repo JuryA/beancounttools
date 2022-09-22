@@ -11,8 +11,8 @@ def test_data(testCase):
     dataDir = os.path.join(
         os.path.dirname(__file__), "data", "generate_base_ccy_prices"
     )
-    inputPath = os.path.join(dataDir, testCase + "_input.beancount")
-    expectedPath = os.path.join(dataDir, testCase + "_expected.beancount")
+    inputPath = os.path.join(dataDir, f"{testCase}_input.beancount")
+    expectedPath = os.path.join(dataDir, f"{testCase}_expected.beancount")
 
     entries, errors, _ = loader.load_file(inputPath)
     if errors:

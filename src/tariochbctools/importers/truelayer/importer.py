@@ -52,7 +52,7 @@ class Importer(importer.ImporterProtocol):
             raise KeyError("At least one of `account` or `accounts` must be specified")
 
     def identify(self, file):
-        return "truelayer.yaml" == path.basename(file.name)
+        return path.basename(file.name) == "truelayer.yaml"
 
     def file_account(self, file):
         return ""
@@ -71,7 +71,7 @@ class Importer(importer.ImporterProtocol):
         )
         tokens = r.json()
         accessToken = tokens["access_token"]
-        headers = {"Authorization": "Bearer " + accessToken}
+        headers = {"Authorization": f"Bearer {accessToken}"}
 
         entries = []
         entries.extend(self._extract_endpoint_transactions("accounts", headers))
@@ -138,20 +138,16 @@ class Importer(importer.ImporterProtocol):
         return entries
 
     def _extract_transaction(self, trx, local_account, transactions, invert_sign):
-        entries = []
-        metakv = {}
-
         id_meta_kvs = {
             k: trx["meta"][k] for k in TX_OPTIONAL_META_ID_FIELDS if trx["meta"].get(k)
         }
-        metakv.update(id_meta_kvs)
-
+        metakv = {} | id_meta_kvs
         id_kvs = {
             k: trx[k]
             for k in TX_MANDATORY_ID_FIELDS + TX_OPTIONAL_ID_FIELDS
             if trx.get(k)
         }
-        metakv.update(id_kvs)
+        metakv |= id_kvs
 
         if trx["transaction_classification"]:
             metakv["category"] = trx["transaction_classification"][0]
@@ -182,8 +178,7 @@ class Importer(importer.ImporterProtocol):
                 ),
             ],
         )
-        entries.append(entry)
-
+        entries = [entry]
         if trx["transaction_id"] == transactions[-1]["transaction_id"]:
             balDate = trxDate + timedelta(days=1)
             metakv = {}

@@ -69,17 +69,17 @@ class Importer(identifier.IdentifyMixin, importer.ImporterProtocol):
                     book_date = None
 
                 if book_date:
-                    amount = self.getAmount(debit, credit)
-
-                    if amount:
+                    if amount := self.getAmount(debit, credit):
                         entries.append(self.createEntry(file, book_date, amount, text))
                     continue
 
                 # Balance entry
                 try:
                     book_date = re.search(
-                        r"Saldo per (\d\d\.\d\d\.\d\d\d\d) zu unseren Gunsten CHF", text
-                    ).group(1)
+                        r"Saldo per (\d\d\.\d\d\.\d\d\d\d) zu unseren Gunsten CHF",
+                        text,
+                    )[1]
+
                     book_date = datetime.strptime(book_date, "%d.%m.%Y").date()
                     # add 1 day: cembra provides balance at EOD, but beancount checks it at SOD
                     book_date = book_date + timedelta(days=1)
@@ -87,9 +87,7 @@ class Importer(identifier.IdentifyMixin, importer.ImporterProtocol):
                     book_date = None
 
                 if book_date:
-                    amount = self.getAmount(debit, credit)
-
-                    if amount:
+                    if amount := self.getAmount(debit, credit):
                         entries.append(self.createBalanceEntry(file, book_date, amount))
 
         return entries

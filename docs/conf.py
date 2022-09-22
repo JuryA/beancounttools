@@ -273,8 +273,8 @@ latex_documents = [
 # latex_domain_indices = True
 
 # -- External mapping --------------------------------------------------------
-python_version = ".".join(map(str, sys.version_info[0:2]))
+python_version = ".".join(map(str, sys.version_info[:2]))
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/" + python_version, None),
+    "python": (f"https://docs.python.org/{python_version}", None),
     "pyscaffold": ("https://pyscaffold.org/en/stable", None),
 }

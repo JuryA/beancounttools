@@ -23,7 +23,7 @@ class Importer(identifier.IdentifyMixin, importer.ImporterProtocol):
     def createEntry(self, file, date, amt, text):
         bookingNrRgexp = re.compile(r"BC Buchungsnr. (?P<bookingRef>\d+)$")
         m = bookingNrRgexp.search(text)
-        bookingRef = m.group("bookingRef")
+        bookingRef = m["bookingRef"]
         text = re.sub(bookingNrRgexp, "", text)
 
         meta = data.new_metadata(file.name, 0, {"zakref": bookingRef})
@@ -54,10 +54,7 @@ class Importer(identifier.IdentifyMixin, importer.ImporterProtocol):
         )
 
     def cleanNumber(self, number):
-        if isinstance(number, str):
-            return D(number.replace("'", ""))
-        else:
-            return number
+        return D(number.replace("'", "")) if isinstance(number, str) else number
 
     def extract(self, file, existing_entries):
         entries = []
@@ -78,11 +75,7 @@ class Importer(identifier.IdentifyMixin, importer.ImporterProtocol):
             cur_df = cur_df[1:]
             cur_df.columns = new_header
 
-            if df is None:
-                df = cur_df
-            else:
-                df = pd.concat([df, cur_df])
-
+            df = cur_df if df is None else pd.concat([df, cur_df])
         date = None
         text = ""
         amount = None
